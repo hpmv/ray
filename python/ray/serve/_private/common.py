@@ -1,7 +1,7 @@
 import json
 from dataclasses import asdict, dataclass, field
 from enum import Enum
-from typing import Any, Awaitable, Callable, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional
 
 from starlette.types import Scope
 
@@ -13,8 +13,11 @@ from ray.serve.generated.serve_pb2 import (
     DeploymentStatusInfo as DeploymentStatusInfoProto,
     DeploymentStatusTrigger as DeploymentStatusTriggerProto,
 )
-from ray.serve.grpc_util import RayServegRPCContext
 from ray.util.annotations import PublicAPI
+
+# Avoid circular import: common.py -> ray.serve -> logging_utils.py -> common.py
+if TYPE_CHECKING:
+    from ray.serve.grpc_util import RayServegRPCContext
 
 REPLICA_ID_FULL_ID_STR_PREFIX = "SERVE_REPLICA::"
 
