@@ -76,8 +76,12 @@ struct NodeManagerConfig {
   /// the node manager will choose its own port.
   int node_manager_port;
   /// The port to connect the runtime env agent. Note the address is equal to the
-  /// node manager address.
+  /// node manager address (unless runtime_env_agent_host is specified).
   int runtime_env_agent_port;
+  /// The host/IP address to connect to runtime env agent. If empty, defaults to
+  /// node_manager_address. Use 127.0.0.1 for same-node connections to avoid
+  /// Tailscale userspace self-connection issues.
+  std::string runtime_env_agent_host;
   /// The lowest port number that workers started will bind on.
   /// If this is set to 0, workers will bind on random ports.
   int min_worker_port;

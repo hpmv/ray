@@ -1565,6 +1565,8 @@ def start_raylet(
     metrics_export_port: Optional[int] = None,
     dashboard_agent_listen_port: Optional[int] = None,
     runtime_env_agent_port: Optional[int] = None,
+    runtime_env_agent_bind_address: Optional[str] = None,
+    runtime_env_agent_host: Optional[str] = None,
     use_valgrind: bool = False,
     use_profiler: bool = False,
     raylet_stdout_filepath: Optional[str] = None,
@@ -1630,6 +1632,13 @@ def start_raylet(
             listens to for HTTP.
         runtime_env_agent_port: The port at which the runtime env agent
             listens to for HTTP.
+        runtime_env_agent_bind_address: The IP address to bind the runtime env
+            agent HTTP server to. If None, defaults to 0.0.0.0 (all interfaces).
+        runtime_env_agent_host: The host/IP address the raylet should use when
+            connecting to the runtime env agent. If None, defaults to node_ip_address.
+            Use 127.0.0.1 for same-node connections to avoid Tailscale userspace issues.
+            Use this to separate the bind address from the advertised node IP address
+            in NAT/containerized environments.
         use_valgrind: True if the raylet should be started inside
             of valgrind. If this is True, use_profiler must be False.
         use_profiler: True if the raylet should be started inside
@@ -1745,6 +1754,9 @@ def start_raylet(
             f"--logging-rotate-bytes={max_bytes}",
             f"--logging-rotate-backup-count={backup_count}",
             f"--runtime-env-agent-port={runtime_env_agent_port}",
+            # Use 127.0.0.1 for runtime env agent to avoid Tailscale userspace issues
+            # Workers on the same node should use localhost, not the advertised node IP
+            "--runtime-env-agent-host=127.0.0.1",
             f"--gcs-address={gcs_address}",
             f"--session-name={session_name}",
             f"--temp-dir={temp_dir}",
@@ -1839,6 +1851,10 @@ def start_raylet(
         f"--log-dir={log_dir}",
         f"--temp-dir={temp_dir}",
     ]
+    if runtime_env_agent_bind_address is not None:
+        runtime_env_agent_command.append(
+            f"--runtime-env-agent-bind-address={runtime_env_agent_bind_address}"
+        )
     if runtime_env_agent_stdout_filepath:
         runtime_env_agent_command.append(
             f"--stdout-filepath={runtime_env_agent_stdout_filepath}"
@@ -1883,6 +1899,7 @@ def start_raylet(
         f"--metrics-agent-port={metrics_agent_port}",
         f"--metrics_export_port={metrics_export_port}",
         f"--runtime_env_agent_port={runtime_env_agent_port}",
+        f"--runtime_env_agent_host={runtime_env_agent_host or node_ip_address}",
         f"--object_store_memory={object_store_memory}",
         f"--plasma_directory={plasma_directory}",
         f"--fallback_directory={fallback_directory}",

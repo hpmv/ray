@@ -266,9 +266,14 @@ NodeManager::NodeManager(
   dashboard_agent_manager_ = CreateDashboardAgentManager(self_node_id, config);
   runtime_env_agent_manager_ = CreateRuntimeEnvAgentManager(self_node_id, config);
 
+  // Use runtime_env_agent_host if specified, otherwise fall back to node_manager_address
+  const std::string runtime_env_agent_addr = config.runtime_env_agent_host.empty()
+      ? config.node_manager_address
+      : config.runtime_env_agent_host;
+
   auto runtime_env_agent_client = RuntimeEnvAgentClient::Create(
       io_service_,
-      config.node_manager_address,
+      runtime_env_agent_addr,
       config.runtime_env_agent_port, /*delay_executor=*/
       [this](std::function<void()> task, uint32_t delay_ms) {
         return execute_after(

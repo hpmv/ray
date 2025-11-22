@@ -614,8 +614,17 @@ class Node:
 
     @property
     def runtime_env_agent_address(self):
-        """Get the address that exposes runtime env agent as http"""
-        return f"http://{build_address(self._node_ip_address, self._runtime_env_agent_port)}"
+        """Get the address that exposes runtime env agent as http
+
+        If runtime_env_agent_host is specified in RayParams, use that instead of
+        node_ip_address. This allows workers on the same node to use 127.0.0.1
+        to avoid Tailscale userspace networking issues.
+        """
+        # Use custom host if provided (e.g., 127.0.0.1 for same-node connections)
+        host = self._ray_params.runtime_env_agent_host
+        if host is None:
+            host = self._node_ip_address
+        return f"http://{build_address(host, self._runtime_env_agent_port)}"
 
     @property
     def dashboard_agent_listen_port(self):
@@ -1220,6 +1229,8 @@ class Node:
             redis_password=self._ray_params.redis_password,
             metrics_agent_port=self._ray_params.metrics_agent_port,
             runtime_env_agent_port=self._ray_params.runtime_env_agent_port,
+            runtime_env_agent_bind_address=self._ray_params.runtime_env_agent_bind_address,
+            runtime_env_agent_host=self._ray_params.runtime_env_agent_host,
             metrics_export_port=self._metrics_export_port,
             dashboard_agent_listen_port=self._ray_params.dashboard_agent_listen_port,
             use_valgrind=use_valgrind,

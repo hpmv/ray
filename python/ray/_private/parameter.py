@@ -86,6 +86,13 @@ class RayParams:
         runtime_env_agent_port: The port at which the runtime env agent
             listens to for HTTP.
             Defaults to random available port.
+        runtime_env_agent_bind_address: The IP address to bind the runtime env
+            agent HTTP server to. If None, defaults to 0.0.0.0 (all interfaces).
+            Use this to separate the bind address from the advertised node IP address
+            in NAT/containerized environments.
+        runtime_env_agent_host: The host/IP address to use when connecting to the
+            runtime env agent. If None, defaults to node_ip_address.
+            Use 127.0.0.1 for same-node connections to avoid Tailscale userspace issues.
         plasma_store_socket_name: If provided, it specifies the socket
             name used by the plasma store.
         raylet_socket_name: If provided, it specifies the socket path
@@ -159,6 +166,8 @@ class RayParams:
             int
         ] = ray_constants.DEFAULT_DASHBOARD_AGENT_LISTEN_PORT,
         runtime_env_agent_port: Optional[int] = None,
+        runtime_env_agent_bind_address: Optional[str] = None,
+        runtime_env_agent_host: Optional[str] = None,
         plasma_store_socket_name: Optional[str] = None,
         raylet_socket_name: Optional[str] = None,
         temp_dir: Optional[str] = None,
@@ -214,6 +223,8 @@ class RayParams:
         self.dashboard_port = dashboard_port
         self.dashboard_agent_listen_port = dashboard_agent_listen_port
         self.runtime_env_agent_port = runtime_env_agent_port
+        self.runtime_env_agent_bind_address = runtime_env_agent_bind_address
+        self.runtime_env_agent_host = runtime_env_agent_host
         self.plasma_store_socket_name = plasma_store_socket_name
         self.raylet_socket_name = raylet_socket_name
         self.temp_dir = temp_dir

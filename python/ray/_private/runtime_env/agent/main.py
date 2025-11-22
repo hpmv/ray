@@ -36,6 +36,16 @@ if __name__ == "__main__":
         help="the IP address of this node.",
     )
     parser.add_argument(
+        "--runtime-env-agent-bind-address",
+        required=False,
+        type=str,
+        default=None,
+        help="The IP address to bind the runtime env agent HTTP server to. "
+        "If not specified, defaults to 0.0.0.0 (all interfaces). "
+        "Use this to separate the bind address from the advertised node IP address "
+        "in NAT/containerized environments.",
+    )
+    parser.add_argument(
         "--runtime-env-agent-port",
         required=True,
         type=int,
@@ -124,6 +134,12 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    # Determine bind address for HTTP server
+    # Default to 0.0.0.0 (all interfaces) if not specified, to support NAT/containerized environments
+    bind_address = args.runtime_env_agent_bind_address
+    if bind_address is None:
+        bind_address = "0.0.0.0"
 
     # Disable log rotation for windows platform.
     logging_rotation_bytes = args.logging_rotate_bytes if sys.platform != "win32" else 0
@@ -219,9 +235,14 @@ if __name__ == "__main__":
             args.log_dir, gcs_client, parent_dead_callback, loop
         )
     try:
+        agent._logger.info(
+            f"Starting runtime env agent HTTP server: "
+            f"bind={bind_address}:{args.runtime_env_agent_port}, "
+            f"advertised_node_ip={args.node_ip_address}"
+        )
         web.run_app(
             app,
-            host=args.node_ip_address,
+            host=bind_address,
             port=args.runtime_env_agent_port,
             loop=loop,
         )

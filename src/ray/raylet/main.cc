@@ -69,6 +69,7 @@ DEFINE_int32(node_manager_port, -1, "The port of node manager.");
 DEFINE_int32(metrics_agent_port, -1, "The port of metrics agent.");
 DEFINE_int32(metrics_export_port, 1, "The port at which metrics are exposed.");
 DEFINE_int32(runtime_env_agent_port, 1, "The port of runtime env agent.");
+DEFINE_string(runtime_env_agent_host, "", "The host/IP address to connect to runtime env agent. If empty, defaults to node_ip_address.");
 DEFINE_string(node_id, "", "The id of this node.");
 DEFINE_string(node_ip_address, "", "The ip address of this node.");
 DEFINE_string(gcs_address, "", "The address of the GCS server, including IP and port.");
@@ -230,6 +231,10 @@ int main(int argc, char *argv[]) {
   const int node_manager_port = static_cast<int>(FLAGS_node_manager_port);
   const int metrics_agent_port = static_cast<int>(FLAGS_metrics_agent_port);
   const int runtime_env_agent_port = static_cast<int>(FLAGS_runtime_env_agent_port);
+  // Use runtime_env_agent_host if specified, otherwise default to node_ip_address
+  const std::string runtime_env_agent_host = FLAGS_runtime_env_agent_host.empty()
+      ? FLAGS_node_ip_address
+      : FLAGS_runtime_env_agent_host;
   RAY_CHECK_NE(FLAGS_node_id, "") << "Expected node ID.";
   const std::string node_id = FLAGS_node_id;
   const std::string node_ip_address = FLAGS_node_ip_address;
@@ -510,6 +515,7 @@ int main(int argc, char *argv[]) {
     node_manager_config.num_prestart_python_workers = num_prestart_python_workers;
     node_manager_config.maximum_startup_concurrency = maximum_startup_concurrency;
     node_manager_config.runtime_env_agent_port = runtime_env_agent_port;
+    node_manager_config.runtime_env_agent_host = runtime_env_agent_host;
     node_manager_config.min_worker_port = min_worker_port;
     node_manager_config.max_worker_port = max_worker_port;
     node_manager_config.worker_ports = worker_ports;

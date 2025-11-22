@@ -523,6 +523,23 @@ Windows powershell users need additional escaping:
     help="The port for the runtime environment agents to listen for http on.",
 )
 @click.option(
+    "--runtime-env-agent-bind-address",
+    type=str,
+    default=None,
+    help="The IP address to bind the runtime env agent HTTP server to. "
+    "If not specified, defaults to 0.0.0.0 (all interfaces). "
+    "Use this to separate the bind address from the advertised node IP address "
+    "in NAT/containerized environments.",
+)
+@click.option(
+    "--runtime-env-agent-host",
+    type=str,
+    default=None,
+    help="The host/IP address the raylet should use when connecting to the runtime env agent. "
+    "If not specified, defaults to node_ip_address. "
+    "Use 127.0.0.1 for same-node connections to avoid Tailscale userspace issues.",
+)
+@click.option(
     "--block",
     is_flag=True,
     default=False,
@@ -702,6 +719,8 @@ def start(
     dashboard_agent_listen_port,
     dashboard_agent_grpc_port,
     runtime_env_agent_port,
+    runtime_env_agent_bind_address,
+    runtime_env_agent_host,
     block,
     plasma_directory,
     object_spilling_directory,
@@ -823,6 +842,8 @@ def start(
         dashboard_agent_listen_port=dashboard_agent_listen_port,
         metrics_agent_port=dashboard_agent_grpc_port,
         runtime_env_agent_port=runtime_env_agent_port,
+        runtime_env_agent_bind_address=runtime_env_agent_bind_address,
+        runtime_env_agent_host=runtime_env_agent_host,
         _system_config=system_config,
         enable_object_reconstruction=enable_object_reconstruction,
         metrics_export_port=metrics_export_port,

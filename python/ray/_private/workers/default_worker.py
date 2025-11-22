@@ -123,6 +123,13 @@ parser.add_argument(
     help="The port on which the runtime env agent receives HTTP requests.",
 )
 parser.add_argument(
+    "--runtime-env-agent-host",
+    required=False,
+    type=str,
+    default=None,
+    help="The host/IP to use when connecting to runtime env agent (defaults to node_ip_address).",
+)
+parser.add_argument(
     "--object-spilling-config",
     required=False,
     type=str,
@@ -231,6 +238,7 @@ if __name__ == "__main__":
         temp_dir=args.temp_dir,
         metrics_agent_port=args.metrics_agent_port,
         runtime_env_agent_port=args.runtime_env_agent_port,
+        runtime_env_agent_host=args.runtime_env_agent_host,
         gcs_address=args.gcs_address,
         session_name=args.session_name,
         webui=args.webui,
