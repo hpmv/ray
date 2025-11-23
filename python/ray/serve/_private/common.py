@@ -670,7 +670,7 @@ class RequestMetadata:
     _request_protocol: RequestProtocol = RequestProtocol.UNDEFINED
 
     # Serve's gRPC context associated with this request for getting and setting metadata
-    grpc_context: Optional[RayServegRPCContext] = None
+    grpc_context = None
 
     _by_reference: bool = True
 
