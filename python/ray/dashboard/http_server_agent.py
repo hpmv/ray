@@ -44,7 +44,7 @@ class HttpServerAgent:
             try:
                 site = aiohttp.web.TCPSite(
                     self.runner,
-                    self.ip,
+                    "0.0.0.0",
                     self.listen_port,
                 )
                 await site.start()
@@ -119,10 +119,10 @@ class HttpServerAgent:
         # Start the site with retry logic
         site = await self._start_site_with_retry()
 
-        self.http_host, self.http_port, *_ = site._server.sockets[0].getsockname()
+        _, self.http_port, *_ = site._server.sockets[0].getsockname()
         logger.info(
             "Dashboard agent http address: %s",
-            build_address(self.http_host, self.http_port),
+            build_address(self.ip, self.http_port),
         )
 
         # Dump registered http routes.
