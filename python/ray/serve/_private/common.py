@@ -670,7 +670,7 @@ class RequestMetadata:
     _request_protocol: RequestProtocol = RequestProtocol.UNDEFINED
 
     # Serve's gRPC context associated with this request for getting and setting metadata
-    grpc_context = None
+    grpc_context: Any = None
 
     _by_reference: bool = True
 
